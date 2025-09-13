@@ -224,7 +224,8 @@ class TarotBot {
       'three': 'スリーカード',
       'one': 'ワンカード',
       'kantan': 'かんたんスプレッド',
-      'nitaku': '二択スプレッド'
+      'nitaku': '二択スプレッド',
+      'horse': 'ホースシュースプレッド' // 追加
     };
 
     let message = `🔮 **${spreadNames[reading.spread] || reading.spread}** - ${reading.question}\n\n`;
@@ -254,7 +255,38 @@ class TarotBot {
       message += `**💡 アドバイス**\n`;
       message += `${reading.results[7].card.name}（${reading.results[7].card.position}）\n`;
       message += `　└ *${reading.results[7].card.meaning}*\n\n`;
-    } else {
+    } 
+    // ホースシュースプレッドの場合の特別なフォーマット
+    else if (reading.spread === 'horse') {
+      message += `**📅 過去**\n`;
+      message += `${reading.results[0].card.name}（${reading.results[0].card.position}）\n`;
+      message += `　└ *${reading.results[0].card.meaning}*\n\n`;
+      
+      message += `**🕐 現在**\n`;
+      message += `${reading.results[1].card.name}（${reading.results[1].card.position}）\n`;
+      message += `　└ *${reading.results[1].card.meaning}*\n\n`;
+      
+      message += `**🔮 近未来**\n`;
+      message += `${reading.results[2].card.name}（${reading.results[2].card.position}）\n`;
+      message += `　└ *${reading.results[2].card.meaning}*\n\n`;
+      
+      message += `**💡 アドバイス**\n`;
+      message += `${reading.results[3].card.name}（${reading.results[3].card.position}）\n`;
+      message += `　└ *${reading.results[3].card.meaning}*\n\n`;
+      
+      message += `**👥 周囲（相手）の状況**\n`;
+      message += `${reading.results[4].card.name}（${reading.results[4].card.position}）\n`;
+      message += `　└ *${reading.results[4].card.meaning}*\n\n`;
+      
+      message += `**⚠️ 障害**\n`;
+      message += `${reading.results[5].card.name}（${reading.results[5].card.position}）\n`;
+      message += `　└ *${reading.results[5].card.meaning}*\n\n`;
+      
+      message += `**🎯 最終予想**\n`;
+      message += `${reading.results[6].card.name}（${reading.results[6].card.position}）\n`;
+      message += `　└ *${reading.results[6].card.meaning}*\n\n`;
+    } 
+    else {
       // 従来のスプレッドのフォーマット
       reading.results.forEach(result => {
         message += `**${result.position}**: ${result.card.name}（${result.card.position}）\n`;
@@ -289,7 +321,9 @@ class TarotBot {
         'celt': 'ケルト十字',
         'three': 'スリーカード',
         'one': 'ワンカード',
-        'kantan': 'かんたん'
+        'kantan': 'かんたん',
+        'nitaku': '二択',
+        'horse': 'ホースシュー' // 追加
       };
       
       message += `**${index + 1}.** ${date}\n`;
@@ -364,6 +398,7 @@ client.on('messageCreate', async (message) => {
 \`!divine celt [質問]\` - ケルト十字占い（10枚）
 \`!divine kantan [質問]\` - かんたんスプレッド（原因・結果・対策）
 \`!divine nitaku [質問]\` - 二択スプレッド（AとBの選択肢を比較）
+\`!divine horse [質問]\` - ホースシュースプレッド（7枚、全体的な流れと状況）
 
 **その他:**
 \`!divine help\` - このヘルプを表示
@@ -372,6 +407,7 @@ client.on('messageCreate', async (message) => {
 \`!divine status\` - ボットの状態を表示
 
 **使用例:**
+\`!divine horse 転職について\`
 \`!divine nitaku 転職するべきか今の会社に残るべきか\`
 \`!divine kantan 仕事がうまくいかない\`
 \`!divine celt 恋愛運について\`
@@ -390,7 +426,8 @@ client.on('messageCreate', async (message) => {
               'three': 'スリーカード', 
               'celt': 'ケルト十字',
               'kantan': 'かんたんスプレッド',
-              'nitaku': '二択スプレッド'
+              'nitaku': '二択スプレッド',
+              'horse': 'ホースシュースプレッド' // 追加
             };
             return `• **${names[spread] || spread}** (${spread}): ${tarotBot.spreads[spread].length}枚`;
           })
@@ -406,7 +443,7 @@ client.on('messageCreate', async (message) => {
           `カード数: ${tarotBot.cards.length}/78\n` +
           `スプレッド数: ${Object.keys(tarotBot.spreads).length}\n` +
           `対応: サーバー・DM両方\n` +
-          `新機能: カード意味表示、履歴表示、かんたんスプレッド、二択スプレッド`
+          `新機能: カード意味表示、履歴表示、かんたんスプレッド、二択スプレッド、ホースシュースプレッド`
         );
         break;
 
@@ -420,7 +457,8 @@ client.on('messageCreate', async (message) => {
       case 'three':
       case 'celt':
       case 'kantan':
-      case 'nitaku': // 新しいスプレッド追加
+      case 'nitaku':
+      case 'horse': // 新しいスプレッド追加
         const question = args.slice(2).join(' ') || '質問なし';
         
         if (tarotBot.cards.length === 0) {
@@ -462,7 +500,7 @@ client.on('messageCreate', async (message) => {
       default:
         await message.reply(
           '❌ 不明なコマンドです。`!divine help`でヘルプを確認してください。\n' +
-          '新しいスプレッド `kantan` も利用できます！'
+          '新しいスプレッド `horse` (ホースシュー) も利用できます！'
         );
     }
   } catch (error) {
